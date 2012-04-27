@@ -58,6 +58,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
   vector<pair<string, string> > options;
   ParseGeneratorParameter(parameter, &options);
 
+  /* TODO remove this
   // -----------------------------------------------------------------
   // parse generator options
 
@@ -88,14 +89,14 @@ bool CppGenerator::Generate(const FileDescriptor* file,
       return false;
     }
   }
-
+  */
   // -----------------------------------------------------------------
 
 
   string basename = StripProto(file->name());
   basename.append(".pb");
 
-  FileGenerator file_generator(file, dllexport_decl);
+  FileGenerator file_generator(file, options);
 
   // Generate header.
   {

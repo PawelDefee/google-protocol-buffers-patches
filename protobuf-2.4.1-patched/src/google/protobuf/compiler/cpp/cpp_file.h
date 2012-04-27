@@ -59,9 +59,8 @@ class ExtensionGenerator;      // extension.h
 
 class FileGenerator {
  public:
-  // See generator.cc for the meaning of dllexport_decl.
   explicit FileGenerator(const FileDescriptor* file,
-                         const string& dllexport_decl);
+                         const vector<pair<string,string> >& options);
   ~FileGenerator();
 
   void GenerateHeader(io::Printer* printer);
@@ -85,7 +84,9 @@ class FileGenerator {
   // E.g. if the package is foo.bar, package_parts_ is {"foo", "bar"}.
   vector<string> package_parts_;
 
+  vector<pair<string,string> > options_;
   string dllexport_decl_;
+  bool use_lower_case_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileGenerator);
 };
