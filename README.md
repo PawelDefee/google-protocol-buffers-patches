@@ -1,7 +1,9 @@
 google-protocol-buffers-patches
 ===============================
 
-This repository contains patches implementing new functionality for Google&#39;s protocol buffers. For more information ong Google protocol buffers, see https://developers.google.com/protocol-buffers/.
+This repository contains patches implementing new functionality for Google&#39;s protocol buffers. For more information on Google protocol buffers, see https://developers.google.com/protocol-buffers/.
+
+To use any of the patches, simply apply them on top of a plain Google protocol buffer installation with the UNIX 'patch' command.
 
 protobuf-2.4.1-camelcase-support.diff
 -------------------------------------
