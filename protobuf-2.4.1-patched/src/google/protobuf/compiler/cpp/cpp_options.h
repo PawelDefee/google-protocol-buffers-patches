@@ -1,5 +1,5 @@
 // Copyright 2012 Pawel Defée.  All rights reserved.
-// Author: kenton@google.com (Kenton Varda)
+// Author: pawel.defee@iki.fi (Pawel Defée)
 
 #ifndef PROTOBUF_COMPILER_CPP_OPTIONS_H__
 #define PROTOBUF_COMPILER_CPP_OPTIONS_H__

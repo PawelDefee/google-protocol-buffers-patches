@@ -51,11 +51,12 @@ namespace protobuf {
 namespace compiler {
 namespace cpp {
 
+class Options;                 // cpp_options.h
+
 class ServiceGenerator {
  public:
-  // See generator.cc for the meaning of dllexport_decl.
   explicit ServiceGenerator(const ServiceDescriptor* descriptor,
-                            const string& dllexport_decl);
+                            const Options* options);
   ~ServiceGenerator();
 
   // Header stuff.
@@ -106,6 +107,7 @@ class ServiceGenerator {
 
   const ServiceDescriptor* descriptor_;
   map<string, string> vars_;
+  const Options* options_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ServiceGenerator);
 };

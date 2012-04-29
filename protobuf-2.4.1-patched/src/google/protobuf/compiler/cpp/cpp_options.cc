@@ -1,5 +1,5 @@
 // Copyright 2012 Pawel Defée.  All rights reserved.
-// Author: kenton@google.com (Kenton Varda)
+// Author: pawel.defee@iki.fi (Pawel Defée)
 
 #include <google/protobuf/compiler/cpp/cpp_options.h>
 

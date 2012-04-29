@@ -66,22 +66,22 @@ FileGenerator::FileGenerator(const FileDescriptor* file,
 
   for (int i = 0; i < file->message_type_count(); i++) {
     message_generators_[i].reset(
-      new MessageGenerator(file->message_type(i), ""));
+      new MessageGenerator(file->message_type(i), options_));
   }
 
   for (int i = 0; i < file->enum_type_count(); i++) {
     enum_generators_[i].reset(
-      new EnumGenerator(file->enum_type(i), ""));
+      new EnumGenerator(file->enum_type(i), options_));
   }
 
   for (int i = 0; i < file->service_count(); i++) {
     service_generators_[i].reset(
-      new ServiceGenerator(file->service(i), ""));
+      new ServiceGenerator(file->service(i), options_));
   }
 
   for (int i = 0; i < file->extension_count(); i++) {
     extension_generators_[i].reset(
-      new ExtensionGenerator(file->extension(i), ""));
+      new ExtensionGenerator(file->extension(i), options_));
   }
 
   SplitStringUsing(file_->package(), ".", &package_parts_);
