@@ -56,12 +56,12 @@ class EnumGenerator;           // enum.h
 class MessageGenerator;        // message.h
 class ServiceGenerator;        // service.h
 class ExtensionGenerator;      // extension.h
+class Options;                 // cpp_options.h
 
 class FileGenerator {
  public:
-  // See generator.cc for the meaning of dllexport_decl.
   explicit FileGenerator(const FileDescriptor* file,
-                         const string& dllexport_decl);
+                         const Options* options);
   ~FileGenerator();
 
   void GenerateHeader(io::Printer* printer);
@@ -85,7 +85,7 @@ class FileGenerator {
   // E.g. if the package is foo.bar, package_parts_ is {"foo", "bar"}.
   vector<string> package_parts_;
 
-  string dllexport_decl_;
+  const Options* options_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileGenerator);
 };

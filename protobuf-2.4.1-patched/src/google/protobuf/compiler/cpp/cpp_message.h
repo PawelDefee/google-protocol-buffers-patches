@@ -52,12 +52,12 @@ namespace cpp {
 
 class EnumGenerator;           // enum.h
 class ExtensionGenerator;      // extension.h
+class Options;                 // cpp_options.h
 
 class MessageGenerator {
  public:
-  // See generator.cc for the meaning of dllexport_decl.
   explicit MessageGenerator(const Descriptor* descriptor,
-                            const string& dllexport_decl);
+                            const Options* options);
   ~MessageGenerator();
 
   // Header stuff.
@@ -153,7 +153,7 @@ class MessageGenerator {
 
   const Descriptor* descriptor_;
   string classname_;
-  string dllexport_decl_;
+  const Options* options_;
   FieldGeneratorMap field_generators_;
   scoped_array<scoped_ptr<MessageGenerator> > nested_generators_;
   scoped_array<scoped_ptr<EnumGenerator> > enum_generators_;

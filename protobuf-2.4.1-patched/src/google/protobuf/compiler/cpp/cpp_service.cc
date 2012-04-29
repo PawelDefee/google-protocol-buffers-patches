@@ -34,6 +34,7 @@
 
 #include <google/protobuf/compiler/cpp/cpp_service.h>
 #include <google/protobuf/compiler/cpp/cpp_helpers.h>
+#include <google/protobuf/compiler/cpp/cpp_options.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/stubs/strutil.h>
 
@@ -43,14 +44,15 @@ namespace compiler {
 namespace cpp {
 
 ServiceGenerator::ServiceGenerator(const ServiceDescriptor* descriptor,
-                                   const string& dllexport_decl)
-  : descriptor_(descriptor) {
+                                   const Options* options)
+  : descriptor_(descriptor),
+    options_(options) {
   vars_["classname"] = descriptor_->name();
   vars_["full_name"] = descriptor_->full_name();
-  if (dllexport_decl.empty()) {
+  if (options_->dllexport_decl().empty()) {
     vars_["dllexport"] = "";
   } else {
-    vars_["dllexport"] = dllexport_decl + " ";
+    vars_["dllexport"] = options_->dllexport_decl() + " ";
   }
 }
 

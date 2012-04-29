@@ -42,6 +42,7 @@
 #include <google/protobuf/compiler/cpp/cpp_enum.h>
 #include <google/protobuf/compiler/cpp/cpp_extension.h>
 #include <google/protobuf/compiler/cpp/cpp_helpers.h>
+#include <google/protobuf/compiler/cpp/cpp_options.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/coded_stream.h>
@@ -280,10 +281,10 @@ void OptimizePadding(vector<const FieldDescriptor*>* fields) {
 // ===================================================================
 
 MessageGenerator::MessageGenerator(const Descriptor* descriptor,
-                                   const string& dllexport_decl)
+                                   const Options* options)
   : descriptor_(descriptor),
     classname_(ClassName(descriptor, false)),
-    dllexport_decl_(dllexport_decl),
+    options_(options),
     field_generators_(descriptor),
     nested_generators_(new scoped_ptr<MessageGenerator>[
       descriptor->nested_type_count()]),
@@ -294,17 +295,17 @@ MessageGenerator::MessageGenerator(const Descriptor* descriptor,
 
   for (int i = 0; i < descriptor->nested_type_count(); i++) {
     nested_generators_[i].reset(
-      new MessageGenerator(descriptor->nested_type(i), dllexport_decl));
+      new MessageGenerator(descriptor->nested_type(i), options_));
   }
 
   for (int i = 0; i < descriptor->enum_type_count(); i++) {
     enum_generators_[i].reset(
-      new EnumGenerator(descriptor->enum_type(i), dllexport_decl));
+      new EnumGenerator(descriptor->enum_type(i), options_));
   }
 
   for (int i = 0; i < descriptor->extension_count(); i++) {
     extension_generators_[i].reset(
-      new ExtensionGenerator(descriptor->extension(i), dllexport_decl));
+      new ExtensionGenerator(descriptor->extension(i), options_));
   }
 }
 
@@ -446,10 +447,10 @@ GenerateClassDefinition(io::Printer* printer) {
   map<string, string> vars;
   vars["classname"] = classname_;
   vars["field_count"] = SimpleItoa(descriptor_->field_count());
-  if (dllexport_decl_.empty()) {
+  if (options_->dllexport_decl().empty()) {
     vars["dllexport"] = "";
   } else {
-    vars["dllexport"] = dllexport_decl_ + " ";
+    vars["dllexport"] = options_->dllexport_decl() + " ";
   }
   vars["superclass"] = SuperClassName(descriptor_);
 
@@ -662,7 +663,7 @@ GenerateClassDefinition(io::Printer* printer) {
   // default_instance_ and reflection_.
   printer->Print(
     "friend void $dllexport_decl$ $adddescriptorsname$();\n",
-    "dllexport_decl", dllexport_decl_,
+    "dllexport_decl", options_->dllexport_decl(),
     "adddescriptorsname",
       GlobalAddDescriptorsName(descriptor_->file()->name()));
   printer->Print(

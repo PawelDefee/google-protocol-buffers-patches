@@ -119,12 +119,12 @@ am_libprotoc_la_OBJECTS = code_generator.lo command_line_interface.lo \
 	plugin.lo plugin.pb.lo subprocess.lo zip_writer.lo cpp_enum.lo \
 	cpp_enum_field.lo cpp_extension.lo cpp_field.lo cpp_file.lo \
 	cpp_generator.lo cpp_helpers.lo cpp_message.lo \
-	cpp_message_field.lo cpp_primitive_field.lo cpp_service.lo \
-	cpp_string_field.lo java_enum.lo java_enum_field.lo \
-	java_extension.lo java_field.lo java_file.lo java_generator.lo \
-	java_helpers.lo java_message.lo java_message_field.lo \
-	java_primitive_field.lo java_service.lo java_string_field.lo \
-	python_generator.lo
+	cpp_message_field.lo cpp_options.lo cpp_primitive_field.lo \
+	cpp_service.lo cpp_string_field.lo java_enum.lo \
+	java_enum_field.lo java_extension.lo java_field.lo \
+	java_file.lo java_generator.lo java_helpers.lo java_message.lo \
+	java_message_field.lo java_primitive_field.lo java_service.lo \
+	java_string_field.lo python_generator.lo
 libprotoc_la_OBJECTS = $(am_libprotoc_la_OBJECTS)
 libprotoc_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -378,7 +378,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -589,6 +588,8 @@ libprotoc_la_SOURCES = \
   google/protobuf/compiler/cpp/cpp_message.h                   \
   google/protobuf/compiler/cpp/cpp_message_field.cc            \
   google/protobuf/compiler/cpp/cpp_message_field.h             \
+  google/protobuf/compiler/cpp/cpp_options.cc                  \
+  google/protobuf/compiler/cpp/cpp_options.h                   \
   google/protobuf/compiler/cpp/cpp_primitive_field.cc          \
   google/protobuf/compiler/cpp/cpp_primitive_field.h           \
   google/protobuf/compiler/cpp/cpp_service.cc                  \
@@ -944,6 +945,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_helpers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_message.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_message_field.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_options.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_primitive_field.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_service.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_string_field.Plo@am__quote@
@@ -1405,6 +1407,13 @@ cpp_message_field.lo: google/protobuf/compiler/cpp/cpp_message_field.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='google/protobuf/compiler/cpp/cpp_message_field.cc' object='cpp_message_field.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cpp_message_field.lo `test -f 'google/protobuf/compiler/cpp/cpp_message_field.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_message_field.cc
+
+cpp_options.lo: google/protobuf/compiler/cpp/cpp_options.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cpp_options.lo -MD -MP -MF $(DEPDIR)/cpp_options.Tpo -c -o cpp_options.lo `test -f 'google/protobuf/compiler/cpp/cpp_options.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_options.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/cpp_options.Tpo $(DEPDIR)/cpp_options.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='google/protobuf/compiler/cpp/cpp_options.cc' object='cpp_options.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cpp_options.lo `test -f 'google/protobuf/compiler/cpp/cpp_options.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_options.cc
 
 cpp_primitive_field.lo: google/protobuf/compiler/cpp/cpp_primitive_field.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cpp_primitive_field.lo -MD -MP -MF $(DEPDIR)/cpp_primitive_field.Tpo -c -o cpp_primitive_field.lo `test -f 'google/protobuf/compiler/cpp/cpp_primitive_field.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_primitive_field.cc

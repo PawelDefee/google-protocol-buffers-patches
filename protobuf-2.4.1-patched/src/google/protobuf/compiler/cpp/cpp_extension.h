@@ -50,6 +50,8 @@ namespace protobuf {
 namespace compiler {
 namespace cpp {
 
+class Options;                 // cpp_options.h
+
 // Generates code for an extension, which may be within the scope of some
 // message or may be at file scope.  This is much simpler than FieldGenerator
 // since extensions are just simple identifiers with interesting types.
@@ -57,7 +59,7 @@ class ExtensionGenerator {
  public:
   // See generator.cc for the meaning of dllexport_decl.
   explicit ExtensionGenerator(const FieldDescriptor* descriptor,
-                              const string& dllexport_decl);
+                              const Options* options);
   ~ExtensionGenerator();
 
   // Header stuff.
@@ -72,7 +74,7 @@ class ExtensionGenerator {
  private:
   const FieldDescriptor* descriptor_;
   string type_traits_;
-  string dllexport_decl_;
+  const Options* options_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionGenerator);
 };
