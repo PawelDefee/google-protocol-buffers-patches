@@ -1,0 +1,1057 @@
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_enum.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_enum.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_enum.cc	2012-04-29 15:25:50.629931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_enum.cc	2012-04-29 15:04:57.613932106 -0700
+@@ -37,6 +37,7 @@
+ 
+ #include <google/protobuf/compiler/cpp/cpp_enum.h>
+ #include <google/protobuf/compiler/cpp/cpp_helpers.h>
++#include <google/protobuf/compiler/cpp/cpp_options.h>
+ #include <google/protobuf/io/printer.h>
+ #include <google/protobuf/stubs/strutil.h>
+ 
+@@ -46,10 +47,10 @@
+ namespace cpp {
+ 
+ EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor,
+-                             const string& dllexport_decl)
++                             const Options* options)
+   : descriptor_(descriptor),
+     classname_(ClassName(descriptor, false)),
+-    dllexport_decl_(dllexport_decl) {
++    options_(options) {
+ }
+ 
+ EnumGenerator::~EnumGenerator() {}
+@@ -88,10 +89,10 @@
+   vars["min_name"] = min_value->name();
+   vars["max_name"] = max_value->name();
+ 
+-  if (dllexport_decl_.empty()) {
++  if (options_->dllexport_decl().empty()) {
+     vars["dllexport"] = "";
+   } else {
+-    vars["dllexport"] = dllexport_decl_ + " ";
++    vars["dllexport"] = options_->dllexport_decl() + " ";
+   }
+ 
+   printer->Print(vars,
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_enum.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_enum.h
+--- p/src/google/protobuf/compiler/cpp/cpp_enum.h	2012-04-29 15:25:50.633931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_enum.h	2012-04-29 15:04:57.613932106 -0700
+@@ -49,11 +49,12 @@
+ namespace compiler {
+ namespace cpp {
+ 
++class Options;                 // cpp_options.h
++
+ class EnumGenerator {
+  public:
+-  // See generator.cc for the meaning of dllexport_decl.
+   explicit EnumGenerator(const EnumDescriptor* descriptor,
+-                         const string& dllexport_decl);
++                         const Options* options);
+   ~EnumGenerator();
+ 
+   // Header stuff.
+@@ -86,7 +87,7 @@
+  private:
+   const EnumDescriptor* descriptor_;
+   string classname_;
+-  string dllexport_decl_;
++  const Options* options_;
+ 
+   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumGenerator);
+ };
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_extension.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_extension.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_extension.cc	2012-04-29 15:25:50.625931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_extension.cc	2012-04-29 15:04:57.613932106 -0700
+@@ -35,6 +35,7 @@
+ #include <google/protobuf/compiler/cpp/cpp_extension.h>
+ #include <map>
+ #include <google/protobuf/compiler/cpp/cpp_helpers.h>
++#include <google/protobuf/compiler/cpp/cpp_options.h>
+ #include <google/protobuf/stubs/strutil.h>
+ #include <google/protobuf/io/printer.h>
+ #include <google/protobuf/descriptor.pb.h>
+@@ -57,9 +58,9 @@
+ }  // anonymous namespace
+ 
+ ExtensionGenerator::ExtensionGenerator(const FieldDescriptor* descriptor,
+-                                       const string& dllexport_decl)
++                                       const Options* options)
+   : descriptor_(descriptor),
+-    dllexport_decl_(dllexport_decl) {
++    options_(options) {
+   // Construct type_traits_.
+   if (descriptor_->is_repeated()) {
+     type_traits_ = "Repeated";
+@@ -106,8 +107,8 @@
+   // export/import specifier.
+   if (descriptor_->extension_scope() == NULL) {
+     vars["qualifier"] = "extern";
+-    if (!dllexport_decl_.empty()) {
+-      vars["qualifier"] = dllexport_decl_ + " " + vars["qualifier"];
++    if (!options_->dllexport_decl().empty()) {
++      vars["qualifier"] = options_->dllexport_decl() + " " + vars["qualifier"];
+     }
+   } else {
+     vars["qualifier"] = "static";
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_extension.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_extension.h
+--- p/src/google/protobuf/compiler/cpp/cpp_extension.h	2012-04-29 15:25:50.625931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_extension.h	2012-04-29 15:04:57.617932106 -0700
+@@ -50,6 +50,8 @@
+ namespace compiler {
+ namespace cpp {
+ 
++class Options;                 // cpp_options.h
++
+ // Generates code for an extension, which may be within the scope of some
+ // message or may be at file scope.  This is much simpler than FieldGenerator
+ // since extensions are just simple identifiers with interesting types.
+@@ -57,7 +59,7 @@
+  public:
+   // See generator.cc for the meaning of dllexport_decl.
+   explicit ExtensionGenerator(const FieldDescriptor* descriptor,
+-                              const string& dllexport_decl);
++                              const Options* options);
+   ~ExtensionGenerator();
+ 
+   // Header stuff.
+@@ -72,7 +74,7 @@
+  private:
+   const FieldDescriptor* descriptor_;
+   string type_traits_;
+-  string dllexport_decl_;
++  const Options* options_;
+ 
+   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionGenerator);
+ };
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_file.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_file.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_file.cc	2012-04-29 15:25:50.629931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_file.cc	2012-04-29 15:04:57.617932106 -0700
+@@ -39,6 +39,7 @@
+ #include <google/protobuf/compiler/cpp/cpp_helpers.h>
+ #include <google/protobuf/compiler/cpp/cpp_message.h>
+ #include <google/protobuf/compiler/cpp/cpp_field.h>
++#include <google/protobuf/compiler/cpp/cpp_options.h>
+ #include <google/protobuf/io/printer.h>
+ #include <google/protobuf/descriptor.pb.h>
+ #include <google/protobuf/stubs/strutil.h>
+@@ -51,7 +52,7 @@
+ // ===================================================================
+ 
+ FileGenerator::FileGenerator(const FileDescriptor* file,
+-                             const string& dllexport_decl)
++                             const Options* options)
+   : file_(file),
+     message_generators_(
+       new scoped_ptr<MessageGenerator>[file->message_type_count()]),
+@@ -61,26 +62,26 @@
+       new scoped_ptr<ServiceGenerator>[file->service_count()]),
+     extension_generators_(
+       new scoped_ptr<ExtensionGenerator>[file->extension_count()]),
+-    dllexport_decl_(dllexport_decl) {
++    options_(options) {
+ 
+   for (int i = 0; i < file->message_type_count(); i++) {
+     message_generators_[i].reset(
+-      new MessageGenerator(file->message_type(i), dllexport_decl));
++      new MessageGenerator(file->message_type(i), options_));
+   }
+ 
+   for (int i = 0; i < file->enum_type_count(); i++) {
+     enum_generators_[i].reset(
+-      new EnumGenerator(file->enum_type(i), dllexport_decl));
++      new EnumGenerator(file->enum_type(i), options_));
+   }
+ 
+   for (int i = 0; i < file->service_count(); i++) {
+     service_generators_[i].reset(
+-      new ServiceGenerator(file->service(i), dllexport_decl));
++      new ServiceGenerator(file->service(i), options_));
+   }
+ 
+   for (int i = 0; i < file->extension_count(); i++) {
+     extension_generators_[i].reset(
+-      new ExtensionGenerator(file->extension(i), dllexport_decl));
++      new ExtensionGenerator(file->extension(i), options_));
+   }
+ 
+   SplitStringUsing(file_->package(), ".", &package_parts_);
+@@ -162,7 +163,7 @@
+     "// Internal implementation detail -- do not call these.\n"
+     "void $dllexport_decl$ $adddescriptorsname$();\n",
+     "adddescriptorsname", GlobalAddDescriptorsName(file_->name()),
+-    "dllexport_decl", dllexport_decl_);
++    "dllexport_decl", options_->dllexport_decl());
+ 
+   printer->Print(
+     // Note that we don't put dllexport_decl on these because they are only
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_file.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_file.h
+--- p/src/google/protobuf/compiler/cpp/cpp_file.h	2012-04-29 15:25:50.629931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_file.h	2012-04-29 15:04:57.617932106 -0700
+@@ -56,12 +56,12 @@
+ class MessageGenerator;        // message.h
+ class ServiceGenerator;        // service.h
+ class ExtensionGenerator;      // extension.h
++class Options;                 // cpp_options.h
+ 
+ class FileGenerator {
+  public:
+-  // See generator.cc for the meaning of dllexport_decl.
+   explicit FileGenerator(const FileDescriptor* file,
+-                         const string& dllexport_decl);
++                         const Options* options);
+   ~FileGenerator();
+ 
+   void GenerateHeader(io::Printer* printer);
+@@ -85,7 +85,7 @@
+   // E.g. if the package is foo.bar, package_parts_ is {"foo", "bar"}.
+   vector<string> package_parts_;
+ 
+-  string dllexport_decl_;
++  const Options* options_;
+ 
+   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileGenerator);
+ };
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_generator.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_generator.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_generator.cc	2012-04-29 15:25:50.625931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_generator.cc	2012-04-29 15:04:57.617932106 -0700
+@@ -39,9 +39,11 @@
+ 
+ #include <google/protobuf/compiler/cpp/cpp_file.h>
+ #include <google/protobuf/compiler/cpp/cpp_helpers.h>
++#include <google/protobuf/compiler/cpp/cpp_options.h>
+ #include <google/protobuf/io/printer.h>
+ #include <google/protobuf/io/zero_copy_stream.h>
+ #include <google/protobuf/descriptor.pb.h>
++#include <google/protobuf/stubs/common.h>
+ 
+ namespace google {
+ namespace protobuf {
+@@ -55,47 +57,24 @@
+                             const string& parameter,
+                             GeneratorContext* generator_context,
+                             string* error) const {
+-  vector<pair<string, string> > options;
+-  ParseGeneratorParameter(parameter, &options);
+-
+-  // -----------------------------------------------------------------
+-  // parse generator options
+-
+-  // TODO(kenton):  If we ever have more options, we may want to create a
+-  //   class that encapsulates them which we can pass down to all the
+-  //   generator classes.  Currently we pass dllexport_decl down to all of
+-  //   them via the constructors, but we don't want to have to add another
+-  //   constructor parameter for every option.
+-
+-  // If the dllexport_decl option is passed to the compiler, we need to write
+-  // it in front of every symbol that should be exported if this .proto is
+-  // compiled into a Windows DLL.  E.g., if the user invokes the protocol
+-  // compiler as:
+-  //   protoc --cpp_out=dllexport_decl=FOO_EXPORT:outdir foo.proto
+-  // then we'll define classes like this:
+-  //   class FOO_EXPORT Foo {
+-  //     ...
+-  //   }
+-  // FOO_EXPORT is a macro which should expand to __declspec(dllexport) or
+-  // __declspec(dllimport) depending on what is being compiled.
+-  string dllexport_decl;
+-
+-  for (int i = 0; i < options.size(); i++) {
+-    if (options[i].first == "dllexport_decl") {
+-      dllexport_decl = options[i].second;
+-    } else {
+-      *error = "Unknown generator option: " + options[i].first;
+-      return false;
+-    }
++  vector<pair<string, string> > options_vector;
++  ParseGeneratorParameter(parameter, &options_vector);
++  
++  // Save options in a container class Options
++  Options* options = Options::options();
++  options->setOptions(&options_vector);
++
++  if(options->error() != "") {
++    *error = options->error();
++    return false;
+   }
+-
++  
+   // -----------------------------------------------------------------
+ 
+-
+   string basename = StripProto(file->name());
+   basename.append(".pb");
+ 
+-  FileGenerator file_generator(file, dllexport_decl);
++  FileGenerator file_generator(file, options);
+ 
+   // Generate header.
+   {
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_helpers.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_helpers.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_helpers.cc	2012-04-29 15:25:50.629931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_helpers.cc	2012-04-29 15:04:57.621932106 -0700
+@@ -37,6 +37,7 @@
+ #include <google/protobuf/stubs/hash.h>
+ 
+ #include <google/protobuf/compiler/cpp/cpp_helpers.h>
++#include <google/protobuf/compiler/cpp/cpp_options.h>
+ #include <google/protobuf/stubs/common.h>
+ #include <google/protobuf/stubs/strutil.h>
+ #include <google/protobuf/stubs/substitute.h>
+@@ -152,7 +153,10 @@
+ 
+ string FieldName(const FieldDescriptor* field) {
+   string result = field->name();
+-  LowerString(&result);
++  // Only convert to lowercase if Options says so
++  if(Options::options()->use_lower_case()) {
++    LowerString(&result);
++  }
+   if (kKeywords.count(result) > 0) {
+     result.append("_");
+   }
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_helpers.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_helpers.h
+--- p/src/google/protobuf/compiler/cpp/cpp_helpers.h	2012-04-29 15:25:50.629931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_helpers.h	2012-04-29 15:04:57.621932106 -0700
+@@ -63,9 +63,8 @@
+ string SuperClassName(const Descriptor* descriptor);
+ 
+ // Get the (unqualified) name that should be used for this field in C++ code.
+-// The name is coerced to lower-case to emulate proto1 behavior.  People
+-// should be using lowercase-with-underscores style for proto field names
+-// anyway, so normally this just returns field->name().
++// The name is coerced to lower-case to emulate proto1 behavior unless
++// the option "use_lower_case" has the value "true".
+ string FieldName(const FieldDescriptor* field);
+ 
+ // Get the unqualified name that should be used for a field's field
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_message.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_message.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_message.cc	2012-04-29 15:25:50.633931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_message.cc	2012-04-29 15:04:57.621932106 -0700
+@@ -42,6 +42,7 @@
+ #include <google/protobuf/compiler/cpp/cpp_enum.h>
+ #include <google/protobuf/compiler/cpp/cpp_extension.h>
+ #include <google/protobuf/compiler/cpp/cpp_helpers.h>
++#include <google/protobuf/compiler/cpp/cpp_options.h>
+ #include <google/protobuf/stubs/strutil.h>
+ #include <google/protobuf/io/printer.h>
+ #include <google/protobuf/io/coded_stream.h>
+@@ -280,10 +281,10 @@
+ // ===================================================================
+ 
+ MessageGenerator::MessageGenerator(const Descriptor* descriptor,
+-                                   const string& dllexport_decl)
++                                   const Options* options)
+   : descriptor_(descriptor),
+     classname_(ClassName(descriptor, false)),
+-    dllexport_decl_(dllexport_decl),
++    options_(options),
+     field_generators_(descriptor),
+     nested_generators_(new scoped_ptr<MessageGenerator>[
+       descriptor->nested_type_count()]),
+@@ -294,17 +295,17 @@
+ 
+   for (int i = 0; i < descriptor->nested_type_count(); i++) {
+     nested_generators_[i].reset(
+-      new MessageGenerator(descriptor->nested_type(i), dllexport_decl));
++      new MessageGenerator(descriptor->nested_type(i), options_));
+   }
+ 
+   for (int i = 0; i < descriptor->enum_type_count(); i++) {
+     enum_generators_[i].reset(
+-      new EnumGenerator(descriptor->enum_type(i), dllexport_decl));
++      new EnumGenerator(descriptor->enum_type(i), options_));
+   }
+ 
+   for (int i = 0; i < descriptor->extension_count(); i++) {
+     extension_generators_[i].reset(
+-      new ExtensionGenerator(descriptor->extension(i), dllexport_decl));
++      new ExtensionGenerator(descriptor->extension(i), options_));
+   }
+ }
+ 
+@@ -446,10 +447,10 @@
+   map<string, string> vars;
+   vars["classname"] = classname_;
+   vars["field_count"] = SimpleItoa(descriptor_->field_count());
+-  if (dllexport_decl_.empty()) {
++  if (options_->dllexport_decl().empty()) {
+     vars["dllexport"] = "";
+   } else {
+-    vars["dllexport"] = dllexport_decl_ + " ";
++    vars["dllexport"] = options_->dllexport_decl() + " ";
+   }
+   vars["superclass"] = SuperClassName(descriptor_);
+ 
+@@ -662,7 +663,7 @@
+   // default_instance_ and reflection_.
+   printer->Print(
+     "friend void $dllexport_decl$ $adddescriptorsname$();\n",
+-    "dllexport_decl", dllexport_decl_,
++    "dllexport_decl", options_->dllexport_decl(),
+     "adddescriptorsname",
+       GlobalAddDescriptorsName(descriptor_->file()->name()));
+   printer->Print(
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_message.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_message.h
+--- p/src/google/protobuf/compiler/cpp/cpp_message.h	2012-04-29 15:25:50.629931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_message.h	2012-04-29 15:04:57.625932106 -0700
+@@ -52,12 +52,12 @@
+ 
+ class EnumGenerator;           // enum.h
+ class ExtensionGenerator;      // extension.h
++class Options;                 // cpp_options.h
+ 
+ class MessageGenerator {
+  public:
+-  // See generator.cc for the meaning of dllexport_decl.
+   explicit MessageGenerator(const Descriptor* descriptor,
+-                            const string& dllexport_decl);
++                            const Options* options);
+   ~MessageGenerator();
+ 
+   // Header stuff.
+@@ -153,7 +153,7 @@
+ 
+   const Descriptor* descriptor_;
+   string classname_;
+-  string dllexport_decl_;
++  const Options* options_;
+   FieldGeneratorMap field_generators_;
+   scoped_array<scoped_ptr<MessageGenerator> > nested_generators_;
+   scoped_array<scoped_ptr<EnumGenerator> > enum_generators_;
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_options.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_options.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_options.cc	1969-12-31 16:00:00.000000000 -0800
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_options.cc	2012-04-29 15:04:57.625932106 -0700
+@@ -0,0 +1,92 @@
++// Copyright 2012 Pawel Defée.  All rights reserved.
++// Author: pawel.defee@iki.fi (Pawel Defée)
++
++#include <google/protobuf/stubs/common.h>
++#include <google/protobuf/stubs/once.h>
++#include <google/protobuf/compiler/cpp/cpp_options.h>
++
++namespace google {
++namespace protobuf {
++namespace compiler {
++namespace cpp {
++
++void Options::setOptions(const vector<pair<string,string> >* options) {
++
++  // -----------------------------------------------------------------
++  // parse generator options
++
++  // If the dllexport_decl option is passed to the compiler, we need to write
++  // it in front of every symbol that should be exported if this .proto is
++  // compiled into a Windows DLL.  E.g., if the user invokes the protocol
++  // compiler as:
++  //   protoc --cpp_out=dllexport_decl=FOO_EXPORT:outdir foo.proto
++  // then we'll define classes like this:
++  //   class FOO_EXPORT Foo {
++  //     ...
++  //   }
++  // FOO_EXPORT is a macro which should expand to __declspec(dllexport) or
++  // __declspec(dllimport) depending on what is being compiled.
++
++  // If the use_lower_case option is passed to the compiler,
++  // we will generate code as follows for its values:
++  // * value equal to true: default Google behavior, force lowercase
++  // * value equal to false: do not convert camelCase to lowercase
++
++  for (int i = 0; i < (*options).size(); i++) {
++    if ((*options)[i].first == "dllexport_decl") {
++      dllexport_decl_ = (*options)[i].second;
++    } else if ((*options)[i].first == "use_lower_case") {
++      if( (*options)[i].second == "false" ) {
++        use_lower_case_ = false;
++      } else if( (*options)[i].second == "true" ) {
++        use_lower_case_ = true;
++      } else {
++        error_ = "Unknown generator option value: " + (*options)[i].second + " for option: " + (*options)[i].first;
++      }
++    } else {
++      error_ = "Unknown generator option: " + (*options)[i].first;
++    }
++  }
++    }
++
++Options::Options()
++  : use_lower_case_(true) {}
++
++Options::~Options() {}
++
++const string& Options::error() const {
++  return error_;
++}
++
++const string& Options::dllexport_decl() const {
++  return dllexport_decl_;
++}
++
++const bool Options::use_lower_case() const {
++  return use_lower_case_;
++}
++
++Options* options_ = NULL;
++GOOGLE_PROTOBUF_DECLARE_ONCE(options_once_init_);
++
++void ShutdownOptions() {
++  delete options_;
++  options_ = NULL;
++}
++
++void InitOptions() {
++  options_ = new Options;
++  internal::OnShutdown(&ShutdownOptions);
++}
++
++Options* Options::options() {
++  ::google::protobuf::GoogleOnceInit(&options_once_init_,
++                 &InitOptions);
++  return options_;
++}
++
++
++}  // namespace cpp
++}  // namespace compiler
++}  // namespace protobuf
++}  // namespace google
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_options.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_options.h
+--- p/src/google/protobuf/compiler/cpp/cpp_options.h	1969-12-31 16:00:00.000000000 -0800
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_options.h	2012-04-29 15:04:57.625932106 -0700
+@@ -0,0 +1,56 @@
++// Copyright 2012 Pawel Defée.  All rights reserved.
++// Author: pawel.defee@iki.fi (Pawel Defée)
++
++#ifndef PROTOBUF_COMPILER_CPP_OPTIONS_H__
++#define PROTOBUF_COMPILER_CPP_OPTIONS_H__
++
++#include <map>
++#include <string>
++#include <vector>
++#include <google/protobuf/stubs/common.h>
++#include <google/protobuf/descriptor.h>
++
++namespace google {
++namespace protobuf {
++namespace compiler {
++namespace cpp {
++
++class Options {
++ public:
++
++  // This class is a singleton.  The caller must not delete the object.
++  static Options* options();
++
++  explicit Options();
++  ~Options();
++
++  // Sets options from a string
++  void setOptions(const vector< pair<string,string> >* options);
++
++  // Returns a possible error from parsing
++  const string& error() const;
++
++  // Return the dllexport_decl option.
++  const string& dllexport_decl() const;
++
++  // Return the use_lower_case option.
++  const bool use_lower_case() const;
++
++ private:
++
++  // error_ holds any error messages from parsing
++  string error_;
++
++  // options
++  string dllexport_decl_;
++  bool use_lower_case_;
++
++  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Options);
++};
++
++}  // namespace cpp
++}  // namespace compiler
++}  // namespace protobuf
++
++}  // namespace google
++#endif  // PROTOBUF_COMPILER_CPP_OPTIONS_H__
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_service.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_service.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_service.cc	2012-04-29 15:25:50.633931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_service.cc	2012-04-29 15:04:57.657932103 -0700
+@@ -34,6 +34,7 @@
+ 
+ #include <google/protobuf/compiler/cpp/cpp_service.h>
+ #include <google/protobuf/compiler/cpp/cpp_helpers.h>
++#include <google/protobuf/compiler/cpp/cpp_options.h>
+ #include <google/protobuf/io/printer.h>
+ #include <google/protobuf/stubs/strutil.h>
+ 
+@@ -43,14 +44,15 @@
+ namespace cpp {
+ 
+ ServiceGenerator::ServiceGenerator(const ServiceDescriptor* descriptor,
+-                                   const string& dllexport_decl)
+-  : descriptor_(descriptor) {
++                                   const Options* options)
++  : descriptor_(descriptor),
++    options_(options) {
+   vars_["classname"] = descriptor_->name();
+   vars_["full_name"] = descriptor_->full_name();
+-  if (dllexport_decl.empty()) {
++  if (options_->dllexport_decl().empty()) {
+     vars_["dllexport"] = "";
+   } else {
+-    vars_["dllexport"] = dllexport_decl + " ";
++    vars_["dllexport"] = options_->dllexport_decl() + " ";
+   }
+ }
+ 
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_service.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_service.h
+--- p/src/google/protobuf/compiler/cpp/cpp_service.h	2012-04-29 15:25:50.629931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_service.h	2012-04-29 15:04:57.657932103 -0700
+@@ -51,11 +51,12 @@
+ namespace compiler {
+ namespace cpp {
+ 
++class Options;                 // cpp_options.h
++
+ class ServiceGenerator {
+  public:
+-  // See generator.cc for the meaning of dllexport_decl.
+   explicit ServiceGenerator(const ServiceDescriptor* descriptor,
+-                            const string& dllexport_decl);
++                            const Options* options);
+   ~ServiceGenerator();
+ 
+   // Header stuff.
+@@ -106,6 +107,7 @@
+ 
+   const ServiceDescriptor* descriptor_;
+   map<string, string> vars_;
++  const Options* options_;
+ 
+   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ServiceGenerator);
+ };
+diff -ruN p/src/google/protobuf/compiler/cpp/cpp_unittest.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_unittest.cc
+--- p/src/google/protobuf/compiler/cpp/cpp_unittest.cc	2012-04-29 15:25:50.625931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_unittest.cc	2012-04-29 15:04:57.661932105 -0700
+@@ -52,6 +52,7 @@
+ #include <google/protobuf/unittest_no_generic_services.pb.h>
+ #include <google/protobuf/test_util.h>
+ #include <google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.h>
++#include <google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.h>
+ #include <google/protobuf/compiler/importer.h>
+ #include <google/protobuf/io/coded_stream.h>
+ #include <google/protobuf/io/zero_copy_stream_impl.h>
+@@ -697,6 +698,35 @@
+   EXPECT_EQ(5, message.friend_());
+ }
+ 
++TEST(GeneratedMessageTest, TestCamelCaseOption) {
++  // This test is mainly checking that the following compiles, which verifies
++  // that the field names were NOT coerced to lower-case as per default. This
++  // is because the proto file has been compiled with the option
++  // 'use_lower_case=false'
++
++  unittest::TestUpperCaseFieldNames message;
++
++  message.set_PrimitiveField(2);
++  message.set_StringField("foo");
++  message.set_EnumField(unittest::EXT_FOO);
++  message.mutable_MessageField()->set_c(6);
++
++  message.add_RepeatedPrimitiveField(8);
++  message.add_RepeatedStringField("qux");
++  message.add_RepeatedEnumField(unittest::EXT_BAR);
++  message.add_RepeatedMessageField()->set_c(15);
++
++  EXPECT_EQ(2, message.PrimitiveField());
++  EXPECT_EQ("foo", message.StringField());
++  EXPECT_EQ(unittest::EXT_FOO, message.EnumField());
++  EXPECT_EQ(6, message.MessageField().c());
++
++  EXPECT_EQ(8, message.RepeatedPrimitiveField(0));
++  EXPECT_EQ("qux", message.RepeatedStringField(0));
++  EXPECT_EQ(unittest::EXT_BAR, message.RepeatedEnumField(0));
++  EXPECT_EQ(15, message.RepeatedMessageField(0).c());
++}
++
+ #ifndef PROTOBUF_TEST_NO_DESCRIPTORS
+ 
+ TEST(GeneratedMessageTest, TestOptimizedForSize) {
+diff -ruN p/src/Makefile.am protobuf-2.4.1-camelcase-support//src/Makefile.am
+--- p/src/Makefile.am	2012-04-29 15:25:50.569931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/Makefile.am	2012-04-29 15:04:57.601932106 -0700
+@@ -31,7 +31,7 @@
+ clean-local:
+ 	rm -f *.loT
+ 
+-CLEANFILES = $(protoc_outputs) unittest_proto_middleman \
++CLEANFILES = $(protoc_outputs) unittest_proto_middleman unittest_proto_middleman_camel_case \
+              testzip.jar testzip.list testzip.proto testzip.zip
+ 
+ MAINTAINERCLEANFILES =   \
+@@ -150,6 +150,8 @@
+   google/protobuf/compiler/cpp/cpp_message.h                   \
+   google/protobuf/compiler/cpp/cpp_message_field.cc            \
+   google/protobuf/compiler/cpp/cpp_message_field.h             \
++  google/protobuf/compiler/cpp/cpp_options.cc                  \
++  google/protobuf/compiler/cpp/cpp_options.h                   \
+   google/protobuf/compiler/cpp/cpp_primitive_field.cc          \
+   google/protobuf/compiler/cpp/cpp_primitive_field.h           \
+   google/protobuf/compiler/cpp/cpp_service.cc                  \
+@@ -201,8 +203,12 @@
+   google/protobuf/unittest_no_generic_services.proto           \
+   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.proto
+ 
++protoc_inputs_camel_case =                                                \
++  google/protobuf/compiler/cpp/cpp_test_camel_case_option.proto
++
+ EXTRA_DIST =                                                   \
+   $(protoc_inputs)                                             \
++  $(protoc_inputs_camel_case)                                  \
+   solaris/libstdc++.la                                         \
+   google/protobuf/io/gzip_stream.h                             \
+   google/protobuf/io/gzip_stream_unittest.sh                   \
+@@ -242,6 +248,8 @@
+   google/protobuf/unittest_lite_imports_nonlite.pb.h           \
+   google/protobuf/unittest_no_generic_services.pb.cc           \
+   google/protobuf/unittest_no_generic_services.pb.h            \
++  google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc  \
++  google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.h   \
+   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc  \
+   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.h
+ 
+@@ -253,6 +261,10 @@
+ 	$(PROTOC) -I$(srcdir) --cpp_out=. $^
+ 	touch unittest_proto_middleman
+ 
++unittest_proto_middleman_camel_case: $(protoc_inputs_camel_case)
++	$(PROTOC) -I$(srcdir) --cpp_out=use_lower_case=false:. $^
++	touch unittest_proto_middleman_camel_case
++
+ else
+ 
+ # We have to cd to $(srcdir) before executing protoc because $(protoc_inputs) is
+@@ -262,9 +274,13 @@
+ 	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/protoc$(EXEEXT) -I. --cpp_out=$$oldpwd $(protoc_inputs) )
+ 	touch unittest_proto_middleman
+ 
++unittest_proto_middleman_camel_case: protoc$(EXEEXT) $(protoc_inputs_camel_case)
++	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/protoc$(EXEEXT) -I. --cpp_out=use_lower_case=false:$$oldpwd $(protoc_inputs_camel_case) )
++	touch unittest_proto_middleman
++
+ endif
+ 
+-$(protoc_outputs): unittest_proto_middleman
++$(protoc_outputs): unittest_proto_middleman unittest_proto_middleman_camel_case
+ 
+ COMMON_TEST_SOURCES =                                          \
+   google/protobuf/test_util.cc                                 \
+diff -ruN p/src/Makefile.in protobuf-2.4.1-camelcase-support//src/Makefile.in
+--- p/src/Makefile.in	2012-04-29 15:25:50.665931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/Makefile.in	2012-04-29 15:04:57.605932106 -0700
+@@ -119,12 +119,12 @@
+ 	plugin.lo plugin.pb.lo subprocess.lo zip_writer.lo cpp_enum.lo \
+ 	cpp_enum_field.lo cpp_extension.lo cpp_field.lo cpp_file.lo \
+ 	cpp_generator.lo cpp_helpers.lo cpp_message.lo \
+-	cpp_message_field.lo cpp_primitive_field.lo cpp_service.lo \
+-	cpp_string_field.lo java_enum.lo java_enum_field.lo \
+-	java_extension.lo java_field.lo java_file.lo java_generator.lo \
+-	java_helpers.lo java_message.lo java_message_field.lo \
+-	java_primitive_field.lo java_service.lo java_string_field.lo \
+-	python_generator.lo
++	cpp_message_field.lo cpp_options.lo cpp_primitive_field.lo \
++	cpp_service.lo cpp_string_field.lo java_enum.lo \
++	java_enum_field.lo java_extension.lo java_field.lo \
++	java_file.lo java_generator.lo java_helpers.lo java_message.lo \
++	java_message_field.lo java_primitive_field.lo java_service.lo \
++	java_string_field.lo python_generator.lo
+ libprotoc_la_OBJECTS = $(am_libprotoc_la_OBJECTS)
+ libprotoc_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+@@ -150,6 +150,7 @@
+ 	protobuf_lazy_descriptor_test-unittest_custom_options.pb.$(OBJEXT) \
+ 	protobuf_lazy_descriptor_test-unittest_lite_imports_nonlite.pb.$(OBJEXT) \
+ 	protobuf_lazy_descriptor_test-unittest_no_generic_services.pb.$(OBJEXT) \
++	protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.$(OBJEXT) \
+ 	protobuf_lazy_descriptor_test-cpp_test_bad_identifiers.pb.$(OBJEXT)
+ nodist_protobuf_lazy_descriptor_test_OBJECTS = $(am__objects_4)
+ protobuf_lazy_descriptor_test_OBJECTS =  \
+@@ -219,6 +220,7 @@
+ 	protobuf_test-unittest_custom_options.pb.$(OBJEXT) \
+ 	protobuf_test-unittest_lite_imports_nonlite.pb.$(OBJEXT) \
+ 	protobuf_test-unittest_no_generic_services.pb.$(OBJEXT) \
++	protobuf_test-cpp_test_camel_case_option.pb.$(OBJEXT) \
+ 	protobuf_test-cpp_test_bad_identifiers.pb.$(OBJEXT)
+ nodist_protobuf_test_OBJECTS = $(am__objects_8)
+ protobuf_test_OBJECTS = $(am_protobuf_test_OBJECTS) \
+@@ -471,7 +473,7 @@
+ nobase_dist_proto_DATA = google/protobuf/descriptor.proto \
+                          google/protobuf/compiler/plugin.proto
+ 
+-CLEANFILES = $(protoc_outputs) unittest_proto_middleman \
++CLEANFILES = $(protoc_outputs) unittest_proto_middleman unittest_proto_middleman_camel_case \
+              testzip.jar testzip.list testzip.proto testzip.zip
+ 
+ MAINTAINERCLEANFILES = \
+@@ -589,6 +591,8 @@
+   google/protobuf/compiler/cpp/cpp_message.h                   \
+   google/protobuf/compiler/cpp/cpp_message_field.cc            \
+   google/protobuf/compiler/cpp/cpp_message_field.h             \
++  google/protobuf/compiler/cpp/cpp_options.cc                  \
++  google/protobuf/compiler/cpp/cpp_options.h                   \
+   google/protobuf/compiler/cpp/cpp_primitive_field.cc          \
+   google/protobuf/compiler/cpp/cpp_primitive_field.h           \
+   google/protobuf/compiler/cpp/cpp_service.cc                  \
+@@ -638,8 +642,12 @@
+   google/protobuf/unittest_no_generic_services.proto           \
+   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.proto
+ 
++protoc_inputs_camel_case = \
++  google/protobuf/compiler/cpp/cpp_test_camel_case_option.proto
++
+ EXTRA_DIST = \
+   $(protoc_inputs)                                             \
++  $(protoc_inputs_camel_case)                                  \
+   solaris/libstdc++.la                                         \
+   google/protobuf/io/gzip_stream.h                             \
+   google/protobuf/io/gzip_stream_unittest.sh                   \
+@@ -679,6 +687,8 @@
+   google/protobuf/unittest_lite_imports_nonlite.pb.h           \
+   google/protobuf/unittest_no_generic_services.pb.cc           \
+   google/protobuf/unittest_no_generic_services.pb.h            \
++  google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc  \
++  google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.h   \
+   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc  \
+   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.h
+ 
+@@ -793,9 +803,9 @@
+ 	      exit 1;; \
+ 	  esac; \
+ 	done; \
+-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
++	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
+ 	$(am__cd) $(top_srcdir) && \
+-	  $(AUTOMAKE) --gnu src/Makefile
++	  $(AUTOMAKE) --foreign src/Makefile
+ .PRECIOUS: Makefile
+ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+ 	@case '$?' in \
+@@ -944,6 +954,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_helpers.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_message.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_message_field.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_options.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_primitive_field.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_service.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpp_string_field.Plo@am__quote@
+@@ -978,6 +989,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plugin.pb.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/printer.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_bad_identifiers.pb.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_lazy_descriptor_test-cpp_unittest.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_lazy_descriptor_test-file.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_lazy_descriptor_test-googletest.Po@am__quote@
+@@ -1003,6 +1015,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_test-cpp_bootstrap_unittest.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_test-cpp_plugin_unittest.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_test-cpp_test_bad_identifiers.pb.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_test-cpp_test_camel_case_option.pb.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_test-cpp_unittest.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_test-descriptor_database_unittest.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protobuf_test-descriptor_unittest.Po@am__quote@
+@@ -1406,6 +1419,13 @@
+ @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cpp_message_field.lo `test -f 'google/protobuf/compiler/cpp/cpp_message_field.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_message_field.cc
+ 
++cpp_options.lo: google/protobuf/compiler/cpp/cpp_options.cc
++@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cpp_options.lo -MD -MP -MF $(DEPDIR)/cpp_options.Tpo -c -o cpp_options.lo `test -f 'google/protobuf/compiler/cpp/cpp_options.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_options.cc
++@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/cpp_options.Tpo $(DEPDIR)/cpp_options.Plo
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='google/protobuf/compiler/cpp/cpp_options.cc' object='cpp_options.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cpp_options.lo `test -f 'google/protobuf/compiler/cpp/cpp_options.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_options.cc
++
+ cpp_primitive_field.lo: google/protobuf/compiler/cpp/cpp_primitive_field.cc
+ @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cpp_primitive_field.lo -MD -MP -MF $(DEPDIR)/cpp_primitive_field.Tpo -c -o cpp_primitive_field.lo `test -f 'google/protobuf/compiler/cpp/cpp_primitive_field.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_primitive_field.cc
+ @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/cpp_primitive_field.Tpo $(DEPDIR)/cpp_primitive_field.Plo
+@@ -1728,6 +1748,20 @@
+ @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_lazy_descriptor_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_lazy_descriptor_test_CXXFLAGS) $(CXXFLAGS) -c -o protobuf_lazy_descriptor_test-unittest_no_generic_services.pb.obj `if test -f 'google/protobuf/unittest_no_generic_services.pb.cc'; then $(CYGPATH_W) 'google/protobuf/unittest_no_generic_services.pb.cc'; else $(CYGPATH_W) '$(srcdir)/google/protobuf/unittest_no_generic_services.pb.cc'; fi`
+ 
++protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.o: google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc
++@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_lazy_descriptor_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_lazy_descriptor_test_CXXFLAGS) $(CXXFLAGS) -MT protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.o -MD -MP -MF $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.Tpo -c -o protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.o `test -f 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc
++@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.Tpo $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.Po
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc' object='protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.o' libtool=no @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_lazy_descriptor_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_lazy_descriptor_test_CXXFLAGS) $(CXXFLAGS) -c -o protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.o `test -f 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc
++
++protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.obj: google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc
++@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_lazy_descriptor_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_lazy_descriptor_test_CXXFLAGS) $(CXXFLAGS) -MT protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.obj -MD -MP -MF $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.Tpo -c -o protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.obj `if test -f 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; then $(CYGPATH_W) 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; else $(CYGPATH_W) '$(srcdir)/google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; fi`
++@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.Tpo $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.Po
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc' object='protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.obj' libtool=no @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_lazy_descriptor_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_lazy_descriptor_test_CXXFLAGS) $(CXXFLAGS) -c -o protobuf_lazy_descriptor_test-cpp_test_camel_case_option.pb.obj `if test -f 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; then $(CYGPATH_W) 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; else $(CYGPATH_W) '$(srcdir)/google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; fi`
++
+ protobuf_lazy_descriptor_test-cpp_test_bad_identifiers.pb.o: google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc
+ @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_lazy_descriptor_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_lazy_descriptor_test_CXXFLAGS) $(CXXFLAGS) -MT protobuf_lazy_descriptor_test-cpp_test_bad_identifiers.pb.o -MD -MP -MF $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_bad_identifiers.pb.Tpo -c -o protobuf_lazy_descriptor_test-cpp_test_bad_identifiers.pb.o `test -f 'google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc
+ @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_bad_identifiers.pb.Tpo $(DEPDIR)/protobuf_lazy_descriptor_test-cpp_test_bad_identifiers.pb.Po
+@@ -2386,6 +2420,20 @@
+ @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_test_CXXFLAGS) $(CXXFLAGS) -c -o protobuf_test-unittest_no_generic_services.pb.obj `if test -f 'google/protobuf/unittest_no_generic_services.pb.cc'; then $(CYGPATH_W) 'google/protobuf/unittest_no_generic_services.pb.cc'; else $(CYGPATH_W) '$(srcdir)/google/protobuf/unittest_no_generic_services.pb.cc'; fi`
+ 
++protobuf_test-cpp_test_camel_case_option.pb.o: google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc
++@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_test_CXXFLAGS) $(CXXFLAGS) -MT protobuf_test-cpp_test_camel_case_option.pb.o -MD -MP -MF $(DEPDIR)/protobuf_test-cpp_test_camel_case_option.pb.Tpo -c -o protobuf_test-cpp_test_camel_case_option.pb.o `test -f 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc
++@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/protobuf_test-cpp_test_camel_case_option.pb.Tpo $(DEPDIR)/protobuf_test-cpp_test_camel_case_option.pb.Po
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc' object='protobuf_test-cpp_test_camel_case_option.pb.o' libtool=no @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_test_CXXFLAGS) $(CXXFLAGS) -c -o protobuf_test-cpp_test_camel_case_option.pb.o `test -f 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc
++
++protobuf_test-cpp_test_camel_case_option.pb.obj: google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc
++@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_test_CXXFLAGS) $(CXXFLAGS) -MT protobuf_test-cpp_test_camel_case_option.pb.obj -MD -MP -MF $(DEPDIR)/protobuf_test-cpp_test_camel_case_option.pb.Tpo -c -o protobuf_test-cpp_test_camel_case_option.pb.obj `if test -f 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; then $(CYGPATH_W) 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; else $(CYGPATH_W) '$(srcdir)/google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; fi`
++@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/protobuf_test-cpp_test_camel_case_option.pb.Tpo $(DEPDIR)/protobuf_test-cpp_test_camel_case_option.pb.Po
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc' object='protobuf_test-cpp_test_camel_case_option.pb.obj' libtool=no @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_test_CXXFLAGS) $(CXXFLAGS) -c -o protobuf_test-cpp_test_camel_case_option.pb.obj `if test -f 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; then $(CYGPATH_W) 'google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; else $(CYGPATH_W) '$(srcdir)/google/protobuf/compiler/cpp/cpp_test_camel_case_option.pb.cc'; fi`
++
+ protobuf_test-cpp_test_bad_identifiers.pb.o: google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc
+ @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(protobuf_test_CPPFLAGS) $(CPPFLAGS) $(protobuf_test_CXXFLAGS) $(CXXFLAGS) -MT protobuf_test-cpp_test_bad_identifiers.pb.o -MD -MP -MF $(DEPDIR)/protobuf_test-cpp_test_bad_identifiers.pb.Tpo -c -o protobuf_test-cpp_test_bad_identifiers.pb.o `test -f 'google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc' || echo '$(srcdir)/'`google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc
+ @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/protobuf_test-cpp_test_bad_identifiers.pb.Tpo $(DEPDIR)/protobuf_test-cpp_test_bad_identifiers.pb.Po
+@@ -2855,6 +2903,10 @@
+ @USE_EXTERNAL_PROTOC_TRUE@	$(PROTOC) -I$(srcdir) --cpp_out=. $^
+ @USE_EXTERNAL_PROTOC_TRUE@	touch unittest_proto_middleman
+ 
++@USE_EXTERNAL_PROTOC_TRUE@unittest_proto_middleman_camel_case: $(protoc_inputs_camel_case)
++@USE_EXTERNAL_PROTOC_TRUE@	$(PROTOC) -I$(srcdir) --cpp_out=use_lower_case=false:. $^
++@USE_EXTERNAL_PROTOC_TRUE@	touch unittest_proto_middleman_camel_case
++
+ # We have to cd to $(srcdir) before executing protoc because $(protoc_inputs) is
+ # relative to srcdir, which may not be the same as the current directory when
+ # building out-of-tree.
+@@ -2862,7 +2914,11 @@
+ @USE_EXTERNAL_PROTOC_FALSE@	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/protoc$(EXEEXT) -I. --cpp_out=$$oldpwd $(protoc_inputs) )
+ @USE_EXTERNAL_PROTOC_FALSE@	touch unittest_proto_middleman
+ 
+-$(protoc_outputs): unittest_proto_middleman
++@USE_EXTERNAL_PROTOC_FALSE@unittest_proto_middleman_camel_case: protoc$(EXEEXT) $(protoc_inputs_camel_case)
++@USE_EXTERNAL_PROTOC_FALSE@	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/protoc$(EXEEXT) -I. --cpp_out=use_lower_case=false:$$oldpwd $(protoc_inputs_camel_case) )
++@USE_EXTERNAL_PROTOC_FALSE@	touch unittest_proto_middleman
++
++$(protoc_outputs): unittest_proto_middleman unittest_proto_middleman_camel_case
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+diff -ruN p/src/solaris/libstdc++.la protobuf-2.4.1-camelcase-support//src/solaris/libstdc++.la
+--- p/src/solaris/libstdc++.la	2012-04-29 15:25:50.569931998 -0700
++++ protobuf-2.4.1-camelcase-support//src/solaris/libstdc++.la	1969-12-31 16:00:00.000000000 -0800
+@@ -1,51 +0,0 @@
+-# libstdc++.la - a libtool library file
+-# Generated by ltmain.sh - GNU libtool 1.4a-GCC3.0 (1.641.2.256 2001/05/28 20:09:07 with GCC-local changes)
+-#
+-# Please DO NOT delete this file!
+-# It is necessary for linking the library.
+-
+-# ---
+-# NOTE: This file lives in /usr/sfw/lib on Solaris 10.  Unfortunately,
+-# due to an apparent bug in the Solaris 10 6/06 release,
+-# /usr/sfw/lib/libstdc++.la is empty.  Below is the correct content,
+-# according to
+-#    http://forum.java.sun.com/thread.jspa?threadID=5073150
+-# By passing LDFLAGS='-Lsrc/solaris' to configure, make will pick up
+-# this copy of the file rather than the empty copy in /usr/sfw/lib.
+-#
+-# Also see
+-#   http://www.technicalarticles.org/index.php/Compiling_MySQL_5.0_on_Solaris_10
+-#
+-# Note: this is for 32-bit systems.  If you have a 64-bit system,
+-# uncomment the appropriate dependency_libs line below.
+-# ----
+-
+-# The name that we can dlopen(3).
+-dlname='libstdc++.so.6'
+-
+-# Names of this library.
+-library_names='libstdc++.so.6.0.3 libstdc++.so.6 libstdc++.so'
+-
+-# The name of the static archive.
+-old_library='libstdc++.a'
+-
+-# Libraries that this one depends upon.
+-# 32-bit version:
+-dependency_libs='-lc -lm -L/usr/sfw/lib -lgcc_s'
+-# 64-bit version:
+-#dependency_libs='-L/lib/64 -lc -lm -L/usr/sfw/lib/64 -lgcc_s'
+-
+-# Version information for libstdc++.
+-current=6
+-age=0
+-revision=3
+-
+-# Is this an already installed library?
+-installed=yes
+-
+-# Files to dlopen/dlpreopen
+-dlopen=''
+-dlpreopen=''
+-
+-# Directory that this library needs to be installed in:
+-libdir='/usr/sfw/lib'
+diff -ruN p/vsprojects/tests.vcproj protobuf-2.4.1-camelcase-support//vsprojects/tests.vcproj
+--- p/vsprojects/tests.vcproj	2012-04-29 15:25:50.569931998 -0700
++++ protobuf-2.4.1-camelcase-support//vsprojects/tests.vcproj	2012-04-29 15:04:57.857932105 -0700
+@@ -183,6 +183,10 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath=".\google\protobuf\compiler\cpp\cpp_test_camel_case_option.pb.h"
++				>
++			</File>
++			<File
+ 				RelativePath="..\src\google\protobuf\testing\file.h"
+ 				>
+ 			</File>
+@@ -267,6 +271,10 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath=".\google\protobuf\compiler\cpp\cpp_test_camel_case_option.pb.cc"
++				>
++			</File>
++			<File
+ 				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_unittest.cc"
+ 				>
+ 			</File>
+@@ -427,6 +435,30 @@
+ 				/>
+ 			</FileConfiguration>
+ 		</File>
++		<File
++			RelativePath="..\src\google\protobuf\compiler\cpp\cpp_test_camel_case_option.proto"
++			>
++			<FileConfiguration
++				Name="Debug|Win32"
++				>
++				<Tool
++					Name="VCCustomBuildTool"
++					Description="Generating cpp_test_camel_case_option.pb.{h,cc}..."
++					CommandLine="Debug\protoc -I../src --cpp_out=. ../src/google/protobuf/compiler/cpp/cpp_test_camel_case_option.proto&#x0D;&#x0A;"
++					Outputs="google\protobuf\compiler\cpp\cpp_test_camel_case_option.pb.h;google\protobuf\compiler\cpp\cpp_test_camel_case_option.pb.cc"
++				/>
++			</FileConfiguration>
++			<FileConfiguration
++				Name="Release|Win32"
++				>
++				<Tool
++					Name="VCCustomBuildTool"
++					Description="Generating cpp_test_camel_case_option.pb.{h,cc}..."
++					CommandLine="Release\protoc -I../src --cpp_out=. ../src/google/protobuf/compiler/cpp/cpp_test_camel_case_option.proto&#x0D;&#x0A;"
++					Outputs="google\protobuf\compiler\cpp\cpp_test_camel_case_option.pb.h;google\protobuf\compiler\cpp\cpp_test_camel_case_option.pb.cc"
++				/>
++			</FileConfiguration>
++		</File>
+ 		<File
+ 			RelativePath="..\src\google\protobuf\unittest.proto"
+ 			>
