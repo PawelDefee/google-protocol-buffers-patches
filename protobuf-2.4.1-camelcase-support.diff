@@ -1,6 +1,6 @@
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_enum.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_enum.cc
---- p/src/google/protobuf/compiler/cpp/cpp_enum.cc	2012-04-29 15:25:50.629931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_enum.cc	2012-04-29 15:04:57.613932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_enum.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_enum.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_enum.cc	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_enum.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -37,6 +37,7 @@
  
  #include <google/protobuf/compiler/cpp/cpp_enum.h>
@@ -35,9 +35,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_enum.cc protobuf-2.4.1-camelcas
    }
  
    printer->Print(vars,
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_enum.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_enum.h
---- p/src/google/protobuf/compiler/cpp/cpp_enum.h	2012-04-29 15:25:50.633931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_enum.h	2012-04-29 15:04:57.613932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_enum.h protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_enum.h
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_enum.h	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_enum.h	2012-05-04 11:06:00.410638370 +0200
 @@ -49,11 +49,12 @@
  namespace compiler {
  namespace cpp {
@@ -62,9 +62,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_enum.h protobuf-2.4.1-camelcase
  
    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumGenerator);
  };
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_extension.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_extension.cc
---- p/src/google/protobuf/compiler/cpp/cpp_extension.cc	2012-04-29 15:25:50.625931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_extension.cc	2012-04-29 15:04:57.613932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_extension.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_extension.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_extension.cc	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_extension.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -35,6 +35,7 @@
  #include <google/protobuf/compiler/cpp/cpp_extension.h>
  #include <map>
@@ -96,9 +96,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_extension.cc protobuf-2.4.1-cam
      }
    } else {
      vars["qualifier"] = "static";
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_extension.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_extension.h
---- p/src/google/protobuf/compiler/cpp/cpp_extension.h	2012-04-29 15:25:50.625931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_extension.h	2012-04-29 15:04:57.617932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_extension.h protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_extension.h
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_extension.h	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_extension.h	2012-05-04 11:06:00.410638370 +0200
 @@ -50,6 +50,8 @@
  namespace compiler {
  namespace cpp {
@@ -126,9 +126,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_extension.h protobuf-2.4.1-came
  
    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionGenerator);
  };
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_file.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_file.cc
---- p/src/google/protobuf/compiler/cpp/cpp_file.cc	2012-04-29 15:25:50.629931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_file.cc	2012-04-29 15:04:57.617932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_file.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_file.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_file.cc	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_file.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -39,6 +39,7 @@
  #include <google/protobuf/compiler/cpp/cpp_helpers.h>
  #include <google/protobuf/compiler/cpp/cpp_message.h>
@@ -187,9 +187,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_file.cc protobuf-2.4.1-camelcas
  
    printer->Print(
      // Note that we don't put dllexport_decl on these because they are only
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_file.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_file.h
---- p/src/google/protobuf/compiler/cpp/cpp_file.h	2012-04-29 15:25:50.629931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_file.h	2012-04-29 15:04:57.617932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_file.h protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_file.h
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_file.h	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_file.h	2012-05-04 11:06:00.410638370 +0200
 @@ -56,12 +56,12 @@
  class MessageGenerator;        // message.h
  class ServiceGenerator;        // service.h
@@ -214,9 +214,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_file.h protobuf-2.4.1-camelcase
  
    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileGenerator);
  };
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_generator.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_generator.cc
---- p/src/google/protobuf/compiler/cpp/cpp_generator.cc	2012-04-29 15:25:50.625931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_generator.cc	2012-04-29 15:04:57.617932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_generator.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_generator.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_generator.cc	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_generator.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -39,9 +39,11 @@
  
  #include <google/protobuf/compiler/cpp/cpp_file.h>
@@ -289,9 +289,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_generator.cc protobuf-2.4.1-cam
  
    // Generate header.
    {
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_helpers.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_helpers.cc
---- p/src/google/protobuf/compiler/cpp/cpp_helpers.cc	2012-04-29 15:25:50.629931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_helpers.cc	2012-04-29 15:04:57.621932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_helpers.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_helpers.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_helpers.cc	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_helpers.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -37,6 +37,7 @@
  #include <google/protobuf/stubs/hash.h>
  
@@ -312,9 +312,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_helpers.cc protobuf-2.4.1-camel
    if (kKeywords.count(result) > 0) {
      result.append("_");
    }
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_helpers.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_helpers.h
---- p/src/google/protobuf/compiler/cpp/cpp_helpers.h	2012-04-29 15:25:50.629931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_helpers.h	2012-04-29 15:04:57.621932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_helpers.h protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_helpers.h
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_helpers.h	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_helpers.h	2012-05-04 11:06:00.410638370 +0200
 @@ -63,9 +63,8 @@
  string SuperClassName(const Descriptor* descriptor);
  
@@ -327,9 +327,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_helpers.h protobuf-2.4.1-camelc
  string FieldName(const FieldDescriptor* field);
  
  // Get the unqualified name that should be used for a field's field
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_message.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_message.cc
---- p/src/google/protobuf/compiler/cpp/cpp_message.cc	2012-04-29 15:25:50.633931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_message.cc	2012-04-29 15:04:57.621932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_message.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_message.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_message.cc	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_message.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -42,6 +42,7 @@
  #include <google/protobuf/compiler/cpp/cpp_enum.h>
  #include <google/protobuf/compiler/cpp/cpp_extension.h>
@@ -394,9 +394,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_message.cc protobuf-2.4.1-camel
      "adddescriptorsname",
        GlobalAddDescriptorsName(descriptor_->file()->name()));
    printer->Print(
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_message.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_message.h
---- p/src/google/protobuf/compiler/cpp/cpp_message.h	2012-04-29 15:25:50.629931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_message.h	2012-04-29 15:04:57.625932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_message.h protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_message.h
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_message.h	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_message.h	2012-05-04 11:06:00.410638370 +0200
 @@ -52,12 +52,12 @@
  
  class EnumGenerator;           // enum.h
@@ -421,9 +421,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_message.h protobuf-2.4.1-camelc
    FieldGeneratorMap field_generators_;
    scoped_array<scoped_ptr<MessageGenerator> > nested_generators_;
    scoped_array<scoped_ptr<EnumGenerator> > enum_generators_;
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_options.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_options.cc
---- p/src/google/protobuf/compiler/cpp/cpp_options.cc	1969-12-31 16:00:00.000000000 -0800
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_options.cc	2012-04-29 15:04:57.625932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_options.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_options.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_options.cc	1970-01-01 01:00:00.000000000 +0100
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_options.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -0,0 +1,92 @@
 +// Copyright 2012 Pawel Defée.  All rights reserved.
 +// Author: pawel.defee@iki.fi (Pawel Defée)
@@ -517,9 +517,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_options.cc protobuf-2.4.1-camel
 +}  // namespace compiler
 +}  // namespace protobuf
 +}  // namespace google
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_options.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_options.h
---- p/src/google/protobuf/compiler/cpp/cpp_options.h	1969-12-31 16:00:00.000000000 -0800
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_options.h	2012-04-29 15:04:57.625932106 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_options.h protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_options.h
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_options.h	1970-01-01 01:00:00.000000000 +0100
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_options.h	2012-05-04 11:06:00.410638370 +0200
 @@ -0,0 +1,56 @@
 +// Copyright 2012 Pawel Defée.  All rights reserved.
 +// Author: pawel.defee@iki.fi (Pawel Defée)
@@ -577,9 +577,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_options.h protobuf-2.4.1-camelc
 +
 +}  // namespace google
 +#endif  // PROTOBUF_COMPILER_CPP_OPTIONS_H__
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_service.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_service.cc
---- p/src/google/protobuf/compiler/cpp/cpp_service.cc	2012-04-29 15:25:50.633931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_service.cc	2012-04-29 15:04:57.657932103 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_service.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_service.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_service.cc	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_service.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -34,6 +34,7 @@
  
  #include <google/protobuf/compiler/cpp/cpp_service.h>
@@ -608,9 +608,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_service.cc protobuf-2.4.1-camel
    }
  }
  
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_service.h protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_service.h
---- p/src/google/protobuf/compiler/cpp/cpp_service.h	2012-04-29 15:25:50.629931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_service.h	2012-04-29 15:04:57.657932103 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_service.h protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_service.h
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_service.h	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_service.h	2012-05-04 11:06:00.410638370 +0200
 @@ -51,11 +51,12 @@
  namespace compiler {
  namespace cpp {
@@ -634,9 +634,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_service.h protobuf-2.4.1-camelc
  
    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ServiceGenerator);
  };
-diff -ruN p/src/google/protobuf/compiler/cpp/cpp_unittest.cc protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_unittest.cc
---- p/src/google/protobuf/compiler/cpp/cpp_unittest.cc	2012-04-29 15:25:50.625931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/google/protobuf/compiler/cpp/cpp_unittest.cc	2012-04-29 15:04:57.661932105 -0700
+diff -ruN protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_unittest.cc protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_unittest.cc
+--- protobuf-2.4.1/src/google/protobuf/compiler/cpp/cpp_unittest.cc	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/google/protobuf/compiler/cpp/cpp_unittest.cc	2012-05-04 11:06:00.410638370 +0200
 @@ -52,6 +52,7 @@
  #include <google/protobuf/unittest_no_generic_services.pb.h>
  #include <google/protobuf/test_util.h>
@@ -681,9 +681,9 @@ diff -ruN p/src/google/protobuf/compiler/cpp/cpp_unittest.cc protobuf-2.4.1-came
  #ifndef PROTOBUF_TEST_NO_DESCRIPTORS
  
  TEST(GeneratedMessageTest, TestOptimizedForSize) {
-diff -ruN p/src/Makefile.am protobuf-2.4.1-camelcase-support//src/Makefile.am
---- p/src/Makefile.am	2012-04-29 15:25:50.569931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/Makefile.am	2012-04-29 15:04:57.601932106 -0700
+diff -ruN protobuf-2.4.1/src/Makefile.am protobuf-2.4.1-camelcase-support/src/Makefile.am
+--- protobuf-2.4.1/src/Makefile.am	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/Makefile.am	2012-05-04 11:06:00.410638370 +0200
 @@ -31,7 +31,7 @@
  clean-local:
  	rm -f *.loT
@@ -750,9 +750,9 @@ diff -ruN p/src/Makefile.am protobuf-2.4.1-camelcase-support//src/Makefile.am
  
  COMMON_TEST_SOURCES =                                          \
    google/protobuf/test_util.cc                                 \
-diff -ruN p/src/Makefile.in protobuf-2.4.1-camelcase-support//src/Makefile.in
---- p/src/Makefile.in	2012-04-29 15:25:50.665931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/Makefile.in	2012-04-29 15:04:57.605932106 -0700
+diff -ruN protobuf-2.4.1/src/Makefile.in protobuf-2.4.1-camelcase-support/src/Makefile.in
+--- protobuf-2.4.1/src/Makefile.in	2012-05-04 11:06:00.562384818 +0200
++++ protobuf-2.4.1-camelcase-support/src/Makefile.in	2012-05-04 11:06:00.410638370 +0200
 @@ -119,12 +119,12 @@
  	plugin.lo plugin.pb.lo subprocess.lo zip_writer.lo cpp_enum.lo \
  	cpp_enum_field.lo cpp_extension.lo cpp_field.lo cpp_file.lo \
@@ -944,64 +944,9 @@ diff -ruN p/src/Makefile.in protobuf-2.4.1-camelcase-support//src/Makefile.in
  
  # Tell versions [3.59,3.63) of GNU make to not export all variables.
  # Otherwise a system limit (for SysV at least) may be exceeded.
-diff -ruN p/src/solaris/libstdc++.la protobuf-2.4.1-camelcase-support//src/solaris/libstdc++.la
---- p/src/solaris/libstdc++.la	2012-04-29 15:25:50.569931998 -0700
-+++ protobuf-2.4.1-camelcase-support//src/solaris/libstdc++.la	1969-12-31 16:00:00.000000000 -0800
-@@ -1,51 +0,0 @@
--# libstdc++.la - a libtool library file
--# Generated by ltmain.sh - GNU libtool 1.4a-GCC3.0 (1.641.2.256 2001/05/28 20:09:07 with GCC-local changes)
--#
--# Please DO NOT delete this file!
--# It is necessary for linking the library.
--
--# ---
--# NOTE: This file lives in /usr/sfw/lib on Solaris 10.  Unfortunately,
--# due to an apparent bug in the Solaris 10 6/06 release,
--# /usr/sfw/lib/libstdc++.la is empty.  Below is the correct content,
--# according to
--#    http://forum.java.sun.com/thread.jspa?threadID=5073150
--# By passing LDFLAGS='-Lsrc/solaris' to configure, make will pick up
--# this copy of the file rather than the empty copy in /usr/sfw/lib.
--#
--# Also see
--#   http://www.technicalarticles.org/index.php/Compiling_MySQL_5.0_on_Solaris_10
--#
--# Note: this is for 32-bit systems.  If you have a 64-bit system,
--# uncomment the appropriate dependency_libs line below.
--# ----
--
--# The name that we can dlopen(3).
--dlname='libstdc++.so.6'
--
--# Names of this library.
--library_names='libstdc++.so.6.0.3 libstdc++.so.6 libstdc++.so'
--
--# The name of the static archive.
--old_library='libstdc++.a'
--
--# Libraries that this one depends upon.
--# 32-bit version:
--dependency_libs='-lc -lm -L/usr/sfw/lib -lgcc_s'
--# 64-bit version:
--#dependency_libs='-L/lib/64 -lc -lm -L/usr/sfw/lib/64 -lgcc_s'
--
--# Version information for libstdc++.
--current=6
--age=0
--revision=3
--
--# Is this an already installed library?
--installed=yes
--
--# Files to dlopen/dlpreopen
--dlopen=''
--dlpreopen=''
--
--# Directory that this library needs to be installed in:
--libdir='/usr/sfw/lib'
-diff -ruN p/vsprojects/tests.vcproj protobuf-2.4.1-camelcase-support//vsprojects/tests.vcproj
---- p/vsprojects/tests.vcproj	2012-04-29 15:25:50.569931998 -0700
-+++ protobuf-2.4.1-camelcase-support//vsprojects/tests.vcproj	2012-04-29 15:04:57.857932105 -0700
+diff -ruN protobuf-2.4.1/vsprojects/tests.vcproj protobuf-2.4.1-camelcase-support/vsprojects/tests.vcproj
+--- protobuf-2.4.1/vsprojects/tests.vcproj	2012-05-04 11:06:00.586641284 +0200
++++ protobuf-2.4.1-camelcase-support/vsprojects/tests.vcproj	2012-05-04 11:06:00.410638370 +0200
 @@ -183,6 +183,10 @@
  				>
  			</File>
@@ -1024,11 +969,10 @@ diff -ruN p/vsprojects/tests.vcproj protobuf-2.4.1-camelcase-support//vsprojects
  				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_unittest.cc"
  				>
  			</File>
-@@ -427,6 +435,30 @@
- 				/>
+@@ -428,6 +436,30 @@
  			</FileConfiguration>
  		</File>
-+		<File
+ 		<File
 +			RelativePath="..\src\google\protobuf\compiler\cpp\cpp_test_camel_case_option.proto"
 +			>
 +			<FileConfiguration
@@ -1052,6 +996,7 @@ diff -ruN p/vsprojects/tests.vcproj protobuf-2.4.1-camelcase-support//vsprojects
 +				/>
 +			</FileConfiguration>
 +		</File>
- 		<File
++		<File
  			RelativePath="..\src\google\protobuf\unittest.proto"
  			>
+ 			<FileConfiguration
